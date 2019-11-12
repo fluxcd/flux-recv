@@ -2,7 +2,8 @@
 
 ## Motivation
 
-`fluxd` has a couple of components which rely on polling external systems for updates, namely:
+`fluxd` has a couple of components which rely on polling external
+systems for updates, namely:
 
  - image update automation polls DockerHub etc.; and,
  - syncing polls a git repo for new commits.
@@ -17,10 +18,14 @@ receiver itself, since:
 
  - to expose it to the internet (or to the cluster) would mean
    exposing the flux API to the internet (or the rest of the cluster),
-   and it's not authenticated;
+   and that is not authenticated;
  - it accepts a payload particular to the flux API, rather than
    processing webhook payloads from elsewhere (which are many and
    varied).
+
+Therefore, this design proposes a separate component which can be run
+as a sidecar, or otherwise, and exposed to the internet via an
+ingress (or in development scenarios using ngrok, say).
 
 ## Requirements
 
@@ -28,7 +33,8 @@ receiver itself, since:
 
  * Support webhook payloads from at least:
   - GitHub
-  - BitBucket cloud (there's an enterprise one with different webhook payloads)
+  - BitBucket cloud (there's an enterprise one with different webhook
+    payloads)
   - GitLab
   - DockerHub
 
@@ -36,22 +42,34 @@ receiver itself, since:
    a signature in an HTTP header; GitLab puts a shared secret in a
    HTTP header; etc.)
 
- * Support different API endpoints for different hooks. The different
-   components may (one day) have different endpoints, e.g., if
-   automation is put into its own container.
-   * These can default to http://localhost:3030/api/flux/v11/notify,
-     since that's where it'll be if running as a sidecar.
-
- * Each endpoint should have its own URL path and (where used) its own shared secret.
+ * Each endpoint should have its own URL path and (where used) its own
+   shared secret.
   * These need to be stable
   * It's also desirable for them to be easy to create and add; making
     a key, then supplying it to the config (and perhaps putting it in
     a secret) would be fine.
 
+ * Some providers require you to install a hook per item; e.g.,
+   DockerHub. It should be possible to make an endpoint that can be
+   installed in a number of related places, but to repeat: this will
+   be particular to the provider.
+
  * It should be possible to route through an ingress using a wildcard,
    so it doesn't need to be changed when e.g., a hook is added.
    * Similarly, it should be easy to construct the hook URL given the
      configuration and ingress rules
+
+## Not requirements (yet)
+
+ * GCP PubSub support (add it later)
+ * other sources of notifications (?)
+ * Support different API endpoints for different kinds of hook. The different
+   components may (one day) have different endpoints -- e.g., if
+   automation is put into its own container -- but not yet.
+   * These can default to http://localhost:3030/api/flux/v11/notify,
+     since that's where it'll be if running as a sidecar.
+ * Forwarding notifications to a different host per endpoint (again:
+   later)
 
 ## Design
 
@@ -59,7 +77,8 @@ In short:
 
  - you add a hook by creating a key pair and adding a record referring
    to it, plus its format (i.e., webhook source), to the config
- - then you provide the private key (and tghe config) in a secret
+ - then you provide the private key (and the config file, possibly) in
+   a secret
  - each key's fingerprint is used in the URL path
    - you can figure it out by calculating that yourself, or looking in
      the logs
@@ -77,6 +96,35 @@ Considerations:
      how-to.
    - If the config refers to keys with a path, they can be mounted
      from different secrets
+
+### Configuration
+
+In general providers will need specific parsing, be verified in
+different ways, and pertain to a particular kind of notification, so
+there's little point trying to be generic in the configuration.
+
+The things that are needed to process an incoming webhook, for each
+endpoint:
+
+ - the distinguishing path element for the particular hook
+ - the location of a shared secret, for verification
+ - how to process the payload
+   - how to parse it
+   - how to verify it
+   - how to construct a payload for the flux API `.../notify` endpoint
+
+```
+version: 1
+api: [http://localhost:3030/api/flux/notify]
+endpoints:
+- source: DockerHub
+  key: dockerhub_rsa
+- source: GitHub
+  key: github_rsa
+```
+
+The keys are paths relative to the config file (in the example, they
+are files in the same directory).
 
 ## Optional elements
 
