@@ -32,11 +32,11 @@ ingress (or in development scenarios using ngrok, say).
  * Support configuration of one or more hooks.
 
  * Support webhook payloads from at least:
-  - GitHub
-  - BitBucket cloud (there's an enterprise one with different webhook
-    payloads)
-  - GitLab
-  - DockerHub
+   - GitHub
+   - BitBucket cloud (there's an enterprise one with different webhook
+     payloads)
+   - GitLab
+   - DockerHub
 
  * Support payload verification where it's available (e.g, GitHub puts
    a signature in an HTTP header; GitLab puts a shared secret in a
@@ -44,14 +44,15 @@ ingress (or in development scenarios using ngrok, say).
 
  * Each endpoint should have its own URL path and (where used) its own
    shared secret.
-  * These need to be stable
-  * It's also desirable for them to be easy to create and add; making
-    a key, then supplying it to the config (and perhaps putting it in
-    a secret) would be fine.
+   * These need to be stable, but can change when e.g., the shared
+     secret changes
+   * It's also desirable for them to be easy to create and add; making
+     a key, then supplying it to the config (and perhaps putting it in
+     a secret) would be fine.
 
  * Some providers require you to install a hook per item; e.g.,
    DockerHub. It should be possible to make an endpoint that can be
-   installed in a number of related places, but to repeat: this will
+   installed in a number of related places; but to repeat: this will
    be particular to the provider.
 
  * It should be possible to route through an ingress using a wildcard,
@@ -113,9 +114,11 @@ endpoint:
    - how to verify it
    - how to construct a payload for the flux API `.../notify` endpoint
 
+Proposed config format:
+
 ```
-version: 1
-api: [http://localhost:3030/api/flux/notify]
+fluxRecvVersion: 1 # must be present and equal `1`
+api: # if empty, default to http://localhost:3030/api/flux
 endpoints:
 - source: DockerHub
   key: dockerhub_rsa
@@ -123,8 +126,8 @@ endpoints:
   key: github_rsa
 ```
 
-The keys are paths relative to the config file (in the example, they
-are files in the same directory).
+The keys are paths relative to the config file (so in the example,
+they are files in the same directory).
 
 ## Optional elements
 
