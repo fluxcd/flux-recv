@@ -121,9 +121,9 @@ fluxRecvVersion: 1 # must be present and equal `1`
 api: # if empty, default to http://localhost:3030/api/flux
 endpoints:
 - source: DockerHub
-  key: dockerhub_rsa
+  keyPath: dockerhub_rsa
 - source: GitHub
-  key: github_rsa
+  keyPath: github_rsa
 ```
 
 The keys are paths relative to the config file (so in the example,
