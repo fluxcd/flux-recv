@@ -9,6 +9,8 @@ import (
 	flag "github.com/spf13/pflag"
 )
 
+const defaultApiBase = "http://localhost:3030/api/flux"
+
 func main() {
 	mainArgs(os.Args[1:])
 }
@@ -41,9 +43,20 @@ func mainArgs(args []string) {
 		println("endpoint", ep.Source, "using key", filepath.Join(configDir, ep.KeyPath))
 	}
 
-	http.HandleFunc("/hook/", func(w http.ResponseWriter, r *http.Request) {
+	apiBase := config.API
+	if apiBase == "" {
+		apiBase = defaultApiBase
+	}
+
+	for _, ep := range config.Endpoints {
+		fingerprint, handler, err := HandlerFromEndpoint(configDir, apiBase, ep)
+		if err != nil {
+			bail(err.Error())
+		}
+		http.Handle("/hook/"+fingerprint, handler)
+	}
+	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		http.NotFound(w, r)
-		return
 	})
 
 	http.ListenAndServe(listen, nil)
