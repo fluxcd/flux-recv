@@ -41,12 +41,33 @@ func TestDockerHubSource(t *testing.T) {
 
 	endpoint := Endpoint{Source: "DockerHub", KeyPath: "dockerhub_rsa"}
 	fp, handler, err := HandlerFromEndpoint("test/fixtures", downstream.URL, endpoint)
+	assert.NoError(t, err)
 
 	hookServer := httptest.NewTLSServer(handler)
 	defer hookServer.Close()
 
 	c := hookServer.Client()
 	req, err := http.NewRequest("POST", hookServer.URL+"/hook/"+fp, bytes.NewReader(loadFixture(t, "dockerhub_payload")))
+	assert.NoError(t, err)
+
+	res, err := c.Do(req)
+	assert.NoError(t, err)
+	assert.Equal(t, 200, res.StatusCode)
+}
+
+func Test_GitHubSource(t *testing.T) {
+	downstream := newDownstream(t, expectedDockerhub)
+	defer downstream.Close()
+
+	endpoint := Endpoint{Source: "GitHub", KeyPath: "github_rsa"}
+	fp, handler, err := HandlerFromEndpoint("test/fixtures", downstream.URL, endpoint)
+	assert.NoError(t, err)
+
+	hookServer := httptest.NewTLSServer(handler)
+	defer hookServer.Close()
+
+	c := hookServer.Client()
+	req, err := http.NewRequest("POST", hookServer.URL+"/hook/"+fp, bytes.NewReader(loadFixture(t, "github_payload")))
 	assert.NoError(t, err)
 
 	res, err := c.Do(req)
