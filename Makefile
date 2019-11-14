@@ -9,7 +9,7 @@ image: ${BIN} Dockerfile
 	docker build -t fluxcd/flux-recv ./build
 
 ${BIN}: # deliberately no prereqs; let go figure it out
-	go build -mod readonly -o $@ ./cmd/flux-recv/
+	go build -mod readonly -o $@ .
 
 test:
-	go test -mod readonly -v ./cmd/flux-recv
+	go test -mod readonly -v .
