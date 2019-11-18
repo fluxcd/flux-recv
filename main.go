@@ -39,9 +39,6 @@ func mainArgs(args []string) {
 	}
 
 	configDir := filepath.Dir(configFile)
-	for _, ep := range config.Endpoints {
-		println("endpoint", ep.Source, "using key", filepath.Join(configDir, ep.KeyPath))
-	}
 
 	apiBase := config.API
 	if apiBase == "" {
@@ -49,11 +46,13 @@ func mainArgs(args []string) {
 	}
 
 	for _, ep := range config.Endpoints {
-		fingerprint, handler, err := HandlerFromEndpoint(configDir, apiBase, ep)
+		digest, handler, err := HandlerFromEndpoint(configDir, apiBase, ep)
 		if err != nil {
 			bail(err.Error())
 		}
-		http.Handle("/hook/"+fingerprint, handler)
+		route := "/hook/" + digest
+		http.Handle(route, handler)
+		println("endpoint", ep.Source, "using key", filepath.Join(configDir, ep.KeyPath), "at", route)
 	}
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		http.NotFound(w, r)
