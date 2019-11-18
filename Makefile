@@ -9,7 +9,7 @@ image: ${BIN} Dockerfile
 	docker build -t fluxcd/flux-recv ./build
 
 ${BIN}: # deliberately no prereqs; let go figure it out
-	go build -mod readonly -o $@ .
+	CGO_ENABLED=0 go build -mod readonly -o $@ .
 
 test:
-	go test -mod readonly -v .
+	CGO_ENABLED=0 go test -mod readonly -v .
