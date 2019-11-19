@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"crypto/sha256"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -37,19 +38,21 @@ func HandlerFromEndpoint(baseDir, apiUrl string, ep Endpoint) (string, http.Hand
 	}
 
 	// 2. load the key so it can be used in the handler, and get the
-	// fingerprint so it can be used to route to this handler
+	// digest so it can be used to route to this handler
 	// TODO...
 	key, err := ioutil.ReadFile(filepath.Join(baseDir, ep.KeyPath))
 	if err != nil {
 		return "", nil, fmt.Errorf("cannot load key from %q: %s", ep.KeyPath, err.Error())
 	}
 
-	fingerprint := "abc123"
+	sha := sha256.New()
+	sha.Write(key)
+	digest := fmt.Sprintf("%x", sha.Sum(nil))
 
 	apiClient := fluxclient.New(http.DefaultClient, fluxhttp.NewAPIRouter(), apiUrl, fluxclient.Token(""))
 
 	// 3. construct a handler from the above
-	return fingerprint, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	return digest, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		sourceHandler(apiClient, key, w, r)
 	}), nil
 }
@@ -111,6 +114,9 @@ func handleGithubPush(s fluxapi.Server, key []byte, w http.ResponseWriter, r *ht
 	}
 
 	switch hook := hook.(type) {
+	case *github.PingEvent:
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte("Pong"))
 	case *github.PushEvent:
 		update := fluxapi_v9.GitUpdate{
 			URL:    *hook.Repo.SSHURL,
@@ -136,8 +142,11 @@ func handleGithubPush(s fluxapi.Server, key []byte, w http.ResponseWriter, r *ht
 			}
 			return
 		}
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte("OK"))
 	default:
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte("unexpected hook kind, but OK"))
 		log("GitHub", "unexpected webhook payload", fmt.Sprintf("received webhook: %T\n%s", hook, github.Stringify(hook)))
 	}
-	w.WriteHeader(http.StatusOK)
 }

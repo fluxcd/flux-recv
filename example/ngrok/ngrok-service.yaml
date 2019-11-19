@@ -1,0 +1,14 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: flux-ngrok
+spec:
+  type: NodePort
+  ports:
+    - name: ngrok
+      port: 4040
+      targetPort: ngrok
+      nodePort: 30082
+  selector:
+    name: ngrok

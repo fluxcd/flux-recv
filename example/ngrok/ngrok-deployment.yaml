@@ -1,0 +1,42 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ngrok
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: ngrok
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        name: ngrok
+    spec:
+      ## You will need something like the following, and the Secret
+      ## itself, if you want to supply an authtoken to ngrok.
+      # volumes:
+      # - name: ngrok-config
+      #   secret:
+      #     secretName: ngrok-config
+      #     defaultMode: 0444 # world-readable; ngrok does not run as root
+      containers:
+      - name: ngrok
+        imagePullPolicy: IfNotPresent
+        image: wernight/ngrok
+
+        volumeMounts:
+        - name: ngrok-config
+          mountPath: /etc/ngrok
+          
+        args:
+        - ngrok
+        - http
+        - 'http://flux-recv:8080/'
+        - -config=/etc/ngrok/ngrok.yml
+        ports:
+        - containerPort: 4040
+          name: ngrok

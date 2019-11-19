@@ -1,0 +1,9 @@
+resources:
+- ngrok-deployment.yaml
+- ngrok-service.yaml
+secretGenerator:
+- name: ngrok-config
+  files:
+  - ngrok.yml
+generatorOptions:
+  disableNameSuffixHash: true
