@@ -115,6 +115,18 @@ func Test_GitHubSource(t *testing.T) {
 	assert.NoError(t, err)
 	assert.True(t, called)
 	assert.Equal(t, 200, res.StatusCode)
+
+	// check that a bogus signature is rejected
+	called = false
+	req, err = http.NewRequest("POST", hookServer.URL+"/hook/"+fp, bytes.NewReader(payload))
+	assert.NoError(t, err)
+	req.Header.Add("Content-Type", "application/json")
+	req.Header.Add("X-GitHub-Event", "push")
+	req.Header.Add("X-Hub-Signature", genGithubMAC(payload[1:] /* <-- i.e., not the same */, loadFixture(t, "github_key")))
+	res, err = c.Do(req)
+	assert.NoError(t, err)
+	assert.False(t, called)
+	assert.Equal(t, 401, res.StatusCode)
 }
 
 // genGithubMAC generates the GitHub HMAC signature for a message provided the secret key
@@ -156,4 +168,16 @@ func Test_GitLabSource(t *testing.T) {
 	assert.NoError(t, err)
 	assert.True(t, called)
 	assert.Equal(t, 200, res.StatusCode)
+
+	// Check that bogus token is rejected
+	called = false
+	req, err = http.NewRequest("POST", hookServer.URL+"/hook/"+fp, bytes.NewReader(payload))
+	assert.NoError(t, err)
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("X-Gitlab-Event", "Push Hook")
+	req.Header.Set("X-Gitlab-Token", "BOGUS"+string(loadFixture(t, "gitlab_key")))
+	res, err = c.Do(req)
+	assert.NoError(t, err)
+	assert.False(t, called)
+	assert.Equal(t, 401, res.StatusCode)
 }
