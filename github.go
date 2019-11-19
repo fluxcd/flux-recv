@@ -12,18 +12,24 @@ import (
 	fluxapi_v9 "github.com/fluxcd/flux/pkg/api/v9"
 )
 
+const GitHub = "GitHub"
+
+func init() {
+	Sources[GitHub] = handleGithubPush
+}
+
 func handleGithubPush(s fluxapi.Server, key []byte, w http.ResponseWriter, r *http.Request) {
 	payload, err := github.ValidatePayload(r, key)
 	if err != nil {
 		http.Error(w, "The GitHub signature header is invalid.", 401)
-		log("GitHub", "invalid signature:", err.Error())
+		log(GitHub, "invalid signature:", err.Error())
 		return
 	}
 
 	hook, err := github.ParseWebHook(github.WebHookType(r), payload)
 	if err != nil {
 		http.Error(w, "Cannot parse payload", http.StatusBadRequest)
-		log("GitHub", "could not parse payload:", err.Error())
+		log(GitHub, "could not parse payload:", err.Error())
 		return
 	}
 
@@ -49,10 +55,10 @@ func handleGithubPush(s fluxapi.Server, key []byte, w http.ResponseWriter, r *ht
 			select {
 			case <-ctx.Done():
 				http.Error(w, "Timed out waiting for response from downstream API", http.StatusRequestTimeout)
-				log("GitHub", "timed out")
+				log(GitHub, "timed out")
 			default:
 				http.Error(w, "Error while calling downstream API", http.StatusInternalServerError)
-				log("GitHub", "error:", err.Error())
+				log(GitHub, "error:", err.Error())
 			}
 			return
 		}
@@ -61,6 +67,6 @@ func handleGithubPush(s fluxapi.Server, key []byte, w http.ResponseWriter, r *ht
 	default:
 		w.WriteHeader(http.StatusOK)
 		w.Write([]byte("unexpected hook kind, but OK"))
-		log("GitHub", "unexpected webhook payload", fmt.Sprintf("received webhook: %T\n%s", hook, github.Stringify(hook)))
+		log(GitHub, "unexpected webhook payload", fmt.Sprintf("received webhook: %T\n%s", hook, github.Stringify(hook)))
 	}
 }

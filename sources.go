@@ -19,10 +19,7 @@ import (
 
 type HookHandler func(s fluxapi.Server, key []byte, w http.ResponseWriter, r *http.Request)
 
-var Sources = map[string]HookHandler{
-	"DockerHub": handleDockerhub,
-	"GitHub":    handleGithubPush,
-}
+var Sources = map[string]HookHandler{}
 
 // -- used for all handlers
 

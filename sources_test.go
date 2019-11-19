@@ -45,7 +45,7 @@ func TestDockerHubSource(t *testing.T) {
 	downstream := newDownstream(t, expectedDockerhub)
 	defer downstream.Close()
 
-	endpoint := Endpoint{Source: "DockerHub", KeyPath: "dockerhub_key"}
+	endpoint := Endpoint{Source: DockerHub, KeyPath: "dockerhub_key"}
 	fp, handler, err := HandlerFromEndpoint("test/fixtures", downstream.URL, endpoint)
 	assert.NoError(t, err)
 
@@ -74,7 +74,7 @@ func Test_GitHubSource(t *testing.T) {
 	// NB key created with
 	//     ruby -rsecurerandom -e 'puts SecureRandom.hex(20)' > test/fixtures/github_key
 	// as suggested in the GitHub docs.
-	endpoint := Endpoint{Source: "GitHub", KeyPath: "github_key"}
+	endpoint := Endpoint{Source: GitHub, KeyPath: "github_key"}
 	fp, handler, err := HandlerFromEndpoint("test/fixtures", downstream.URL, endpoint)
 	assert.NoError(t, err)
 
