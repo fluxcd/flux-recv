@@ -17,7 +17,7 @@ import (
 )
 
 // helper to create a downstream flux API which will check the /notify payload is as expected
-func newDownstream(t *testing.T, expectedPayload string) *httptest.Server {
+func newDownstream(t *testing.T, expectedPayload string, called *bool) *httptest.Server {
 	downstream := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, "/v11/notify", r.URL.Path)
 		defer r.Body.Close()
@@ -25,6 +25,7 @@ func newDownstream(t *testing.T, expectedPayload string) *httptest.Server {
 		assert.NoError(t, err)
 		assert.Equal(t, expectedPayload, string(bytes))
 		fmt.Fprintln(w, `{"status": "OK"}`)
+		*called = true
 	}))
 	return downstream
 }
@@ -41,8 +42,9 @@ const expectedDockerhub = `{"Kind":"image","Source":{"Name":{"Domain":"","Image"
 // Test that a hook arriving at a DockerHub endpoint calls the
 // downstream with an image update. Docs:
 // https://docs.docker.com/docker-hub/webhooks/
-func TestDockerHubSource(t *testing.T) {
-	downstream := newDownstream(t, expectedDockerhub)
+func Test_DockerHubSource(t *testing.T) {
+	var called bool
+	downstream := newDownstream(t, expectedDockerhub, &called)
 	defer downstream.Close()
 
 	endpoint := Endpoint{Source: DockerHub, KeyPath: "dockerhub_key"}
@@ -58,6 +60,7 @@ func TestDockerHubSource(t *testing.T) {
 
 	res, err := c.Do(req)
 	assert.NoError(t, err)
+	assert.True(t, called)
 	assert.Equal(t, 200, res.StatusCode)
 }
 
@@ -68,7 +71,8 @@ const expectedGithub = `{"Kind":"git","Source":{"URL":"git@github.com:Codertocat
 // and the headers
 // https://developer.github.com/v3/repos/hooks/#webhook-headers
 func Test_GitHubSource(t *testing.T) {
-	downstream := newDownstream(t, expectedGithub)
+	var called bool
+	downstream := newDownstream(t, expectedGithub, &called)
 	defer downstream.Close()
 
 	// NB key created with
@@ -94,8 +98,10 @@ func Test_GitHubSource(t *testing.T) {
 
 	res, err := c.Do(req)
 	assert.NoError(t, err)
+	assert.True(t, called)
 	assert.Equal(t, 200, res.StatusCode)
 
+	called = false
 	// Now using form encoded
 	form := url.Values{}
 	form.Add("payload", string(payload))
@@ -107,7 +113,20 @@ func Test_GitHubSource(t *testing.T) {
 
 	res, err = c.Do(req)
 	assert.NoError(t, err)
+	assert.True(t, called)
 	assert.Equal(t, 200, res.StatusCode)
+
+	// check that a bogus signature is rejected
+	called = false
+	req, err = http.NewRequest("POST", hookServer.URL+"/hook/"+fp, bytes.NewReader(payload))
+	assert.NoError(t, err)
+	req.Header.Add("Content-Type", "application/json")
+	req.Header.Add("X-GitHub-Event", "push")
+	req.Header.Add("X-Hub-Signature", genGithubMAC(payload[1:] /* <-- i.e., not the same */, loadFixture(t, "github_key")))
+	res, err = c.Do(req)
+	assert.NoError(t, err)
+	assert.False(t, called)
+	assert.Equal(t, 401, res.StatusCode)
 }
 
 // genGithubMAC generates the GitHub HMAC signature for a message provided the secret key
@@ -119,4 +138,46 @@ func genGithubMAC(message, key []byte) string {
 	hexSignature := make([]byte, hex.EncodedLen(len(signature)))
 	hex.Encode(hexSignature, signature)
 	return "sha512=" + string(hexSignature)
+}
+
+// expected notification posted to the flux API. NB because it's a branch head, the refs/heads/ is stripped.
+const expectedGitlab = `{"Kind":"git","Source":{"URL":"git@example.com:mike/diaspora.git","Branch":"master"}}`
+
+func Test_GitLabSource(t *testing.T) {
+	var called bool
+	downstream := newDownstream(t, expectedGitlab, &called)
+	defer downstream.Close()
+
+	endpoint := Endpoint{Source: GitLab, KeyPath: "gitlab_key"}
+	fp, handler, err := HandlerFromEndpoint("test/fixtures", downstream.URL, endpoint)
+	assert.NoError(t, err)
+
+	hookServer := httptest.NewTLSServer(handler)
+	defer hookServer.Close()
+
+	payload := loadFixture(t, "gitlab_payload")
+
+	c := hookServer.Client()
+	req, err := http.NewRequest("POST", hookServer.URL+"/hook/"+fp, bytes.NewReader(payload))
+	assert.NoError(t, err)
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("X-Gitlab-Event", "Push Hook")
+	req.Header.Set("X-Gitlab-Token", string(loadFixture(t, "gitlab_key")))
+
+	res, err := c.Do(req)
+	assert.NoError(t, err)
+	assert.True(t, called)
+	assert.Equal(t, 200, res.StatusCode)
+
+	// Check that bogus token is rejected
+	called = false
+	req, err = http.NewRequest("POST", hookServer.URL+"/hook/"+fp, bytes.NewReader(payload))
+	assert.NoError(t, err)
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("X-Gitlab-Event", "Push Hook")
+	req.Header.Set("X-Gitlab-Token", "BOGUS"+string(loadFixture(t, "gitlab_key")))
+	res, err = c.Do(req)
+	assert.NoError(t, err)
+	assert.False(t, called)
+	assert.Equal(t, 401, res.StatusCode)
 }
