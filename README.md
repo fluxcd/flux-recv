@@ -18,6 +18,7 @@ exposing to the internet, because
 
  - `GitHub` push events (and ping events)
  - `DockerHub` image push events
+ - `GitLab` push events
 
 ## How to use it
 
