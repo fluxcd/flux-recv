@@ -44,10 +44,11 @@ configuration in it:
 
  - create the secret -- [GitHub
    recommends](https://developer.github.com/webhooks/securing/) 20
-   bytes of randomness
+   bytes of randomness (NB I am using `print` rather than `puts`
+   because newlines will mess things up):
 
 ```
-$ ruby -rsecurerandom -e 'puts SecureRandom.hex(20)' > ./github.key
+$ ruby -rsecurerandom -e 'print SecureRandom.hex(20)' > ./github.key
 ```
 
  - create a configuration that refers to it:
