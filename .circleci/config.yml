@@ -1,10 +1,54 @@
 version: 2
 jobs:
   build:
-
     docker:
     - image: circleci/golang:1.13
 
     steps:
     - checkout
     - run: make test
+    - run: make bin
+    - setup_remote_docker
+    - run: make image
+    - run: docker save -o build/flux-recv.tar fluxcd/flux-recv:latest 
+    - persist_to_workspace:
+        root: '.'
+        paths:
+        - build
+
+  push:
+    docker:
+    - image: circleci/golang:1.13
+
+    steps:
+    - attach_workspace:
+        at: '.'
+    - setup_remote_docker
+    - deploy: # only run in one place
+        command: docker load -i ./build/flux-recv.tar
+    - deploy: # only run in one place
+        command: |
+          if echo ${CIRCLE_TAG}" | grep -Eq "^v[0-9]+(\.[0-9]+)*(-[a-z0-9]+)?$"; then
+            TAG="${CIRCLE_TAG#v}"
+            echo "$DOCKER_FLUXCD_PASSWORD" | docker login --username "$DOCKER_FLUXCD_USER" --password-stdin
+            docker tag fluxcd/flux-recv:latest "fluxcd/flux-recv:$TAG"
+            docker push "fluxcd/flux-recv:$TAG"
+          fi
+
+workflows:
+  version: 2
+  build-test-deploy:
+    jobs:
+    - build:
+        filters:
+          tags:
+            only: /.*/ # required because this job is a prereq of push
+
+    - push:
+        requires:
+        - build
+        filters:
+          tags:
+            only: /v[0-9]+.[0-9]+.[0-9]+(-.*)?/
+          branches:
+            ignore: /.*/
