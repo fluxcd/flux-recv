@@ -1,3 +1,5 @@
+[![CircleCI](https://circleci.com/gh/fluxcd/flux-recv.svg?style=svg)](https://circleci.com/gh/fluxcd/flux-recv)
+
 # Flux webhook receiver
 
 The container image built herein acts as a webhook endpoint, that will
