@@ -28,6 +28,7 @@ In short:
  - run `fluxcd/flux-recv` as a sidecar in the flux deployment
  - expose the flux-recv listener to the internet
  - install webhooks at the source provider (e.g., GitHub)
+ - check if it works
 
 These are explained in more depth in the following sections.
 
@@ -219,6 +220,10 @@ The _host_ part of your webhook URLs will be something like
 (which is why we went to some trouble to run it in its own
 deployment).
 
+The example ngrok configuration includes a Service with a NodePort, so
+you can access ngrok's web UI. You may wish to remove the NodePort, or
+the service entirely, and use `kubectl port-forward` instead.
+
 ### Install webhook at the source
 
 Each webhook source has its own user interface or API for installing
@@ -251,3 +256,42 @@ GitHub (and others) require the shared secret, which you can take
 directly from the file created in the first step (be careful not to
 introduce extra characters into the file, if you load it in an
 editor).
+
+### Check if it works
+
+The easiest way to do this is to watch fluxd's logs, and push a new
+commit (or image) to the repo for which you installed the hook.
+
+    kubectl logs deploy/flux -f
+
+
+You should see a log message indicating that fluxd has either
+
+ * refreshed the git repo
+
+```
+ts=2019-11-20T16:29:26.871873132Z caller=loop.go:127 component=sync-loop event=refreshed url=ssh://git@github.com/squaremo/flux-example
+```
+
+ * ignored the notification because it's the wrong branch
+
+```
+ts=2019-11-19T15:03:06.477412849Z caller=daemon.go:540 component=daemon msg="notified about unrelated change" url=git@github.com:squaremo/flux-example.git branch=refs/tags/flux-write-check
+```
+
+ * scheduled an image repo refresh
+
+```
+ts=2019-11-20T16:34:30.134889169Z caller=warming.go:95 component=warmer priority=squaremo/helloworld
+```
+
+Some sources (e.g., GitHub, GitLab) let you test or re-rerun hooks
+from their webhook configuration, which can be useful for
+debugging. If you are using ngrok, it's also possible to re-run a hook
+from its dashboard.
+
+It is safe to re-run hooks, because `fluxd` treats notifications as a
+trigger to refresh state, rather than as authoritative themselves. For
+example, when informed of an image push, fluxd does not add the image
+mentioned to its database -- it polls the image registry in question
+to determine whether there is a new image.
