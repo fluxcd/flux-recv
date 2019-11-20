@@ -117,8 +117,8 @@ The second bit goes under `.spec.template.containers`:
       # containers:
 
       - name: recv
-        image: fluxcd/flux-recv
-        imagePullPolicy: Never
+        image: fluxcd/flux-recv:0.2.0
+        imagePullPolicy: IfNotPresent
         args:
         - --config=/etc/fluxrecv/fluxrecv.yaml
 
