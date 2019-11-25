@@ -75,9 +75,9 @@ and in [`sources.go`](./sources.go)).
 $ cat >> kustomization.yaml <<EOF
 secretGenerator:
 - name: fluxrecv-config
-files:
-- github.key
-- fluxrecv.yaml
+  files:
+  - github.key
+  - fluxrecv.yaml
 generatorOptions:
 disableNameSuffixHash: true
 EOF
@@ -123,7 +123,8 @@ The second bit goes under `.spec.template.containers`:
         imagePullPolicy: IfNotPresent
         args:
         - --config=/etc/fluxrecv/fluxrecv.yaml
-
+        ports:
+        - containerPort: 8080
         volumeMounts:
         - name: fluxrecv-config
           mountPath: /etc/fluxrecv
