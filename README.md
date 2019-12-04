@@ -79,7 +79,7 @@ secretGenerator:
   - github.key
   - fluxrecv.yaml
 generatorOptions:
-disableNameSuffixHash: true
+  disableNameSuffixHash: true
 EOF
 ```
 
