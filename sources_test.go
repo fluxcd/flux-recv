@@ -181,3 +181,42 @@ func Test_GitLabSource(t *testing.T) {
 	assert.False(t, called)
 	assert.Equal(t, 401, res.StatusCode)
 }
+
+const expectedBitbucketCloud = `{"Kind":"git","Source":{"URL":"git@bitbucket.org:mbridgen/dummy.git","Branch":"master"}}`
+
+func TestBitbucketCloud(t *testing.T) {
+	var called bool
+	downstream := newDownstream(t, expectedBitbucketCloud, &called)
+	defer downstream.Close()
+
+	endpoint := Endpoint{Source: BitbucketCloud, KeyPath: "bitbucketorg_key"}
+	fp, handler, err := HandlerFromEndpoint("test/fixtures", downstream.URL, endpoint)
+	assert.NoError(t, err)
+
+	hookServer := httptest.NewTLSServer(handler)
+	defer hookServer.Close()
+
+	payload := loadFixture(t, "bitbucketorg_payload")
+
+	c := hookServer.Client()
+	req, err := http.NewRequest("POST", hookServer.URL+"/hook/"+fp, bytes.NewReader(payload))
+	assert.NoError(t, err)
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("X-Event-Key", "repo:push")
+
+	res, err := c.Do(req)
+	assert.NoError(t, err)
+	assert.True(t, called)
+	assert.Equal(t, 200, res.StatusCode)
+
+	// Check that wrong event key gets an error
+	called = false
+	req, err = http.NewRequest("POST", hookServer.URL+"/hook/"+fp, bytes.NewReader(payload))
+	assert.NoError(t, err)
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("X-Event-Key", "flurb")
+	res, err = c.Do(req)
+	assert.NoError(t, err)
+	assert.False(t, called)
+	assert.Equal(t, 400, res.StatusCode)
+}
