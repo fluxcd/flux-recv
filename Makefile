@@ -1,6 +1,6 @@
 BIN=./build/flux-recv
 
-.PHONY: all image test bin
+.PHONY: all image test bin FORCE
 
 all: image
 
@@ -10,7 +10,7 @@ image: ${BIN} Dockerfile
 
 bin: ${BIN}
 
-${BIN}: # deliberately no prereqs; let go figure it out
+${BIN}: FORCE # deliberately no prereqs; let go figure it out
 	CGO_ENABLED=0 go build -mod readonly -o $@ .
 
 test:
