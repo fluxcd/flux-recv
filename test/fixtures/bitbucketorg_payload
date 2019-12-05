@@ -1,0 +1,260 @@
+{
+  "push": {
+    "changes": [
+      {
+        "forced": false,
+        "old": {
+          "target": {
+            "hash": "2269f06c06bebc4f4da528a4144390fddd2cc190",
+            "links": {
+              "self": {
+                "href": "https://api.bitbucket.org/2.0/repositories/mbridgen/dummy/commit/2269f06c06bebc4f4da528a4144390fddd2cc190"
+              },
+              "html": {
+                "href": "https://bitbucket.org/mbridgen/dummy/commits/2269f06c06bebc4f4da528a4144390fddd2cc190"
+              }
+            },
+            "author": {
+              "raw": "Michael Bridgen <michael@weave.works>",
+              "type": "author",
+              "user": {
+                "username": "mbridgen",
+                "display_name": "Michael Bridgen",
+                "account_id": "5bf2cda767e4d1175166c7f6",
+                "links": {
+                  "self": {
+                    "href": "https://api.bitbucket.org/2.0/users/mbridgen"
+                  },
+                  "html": {
+                    "href": "https://bitbucket.org/mbridgen/"
+                  },
+                  "avatar": {
+                    "href": "https://bitbucket.org/account/mbridgen/avatar/"
+                  }
+                },
+                "type": "user",
+                "nickname": "mbridgen",
+                "uuid": "{3995cc2b-9848-486a-908a-8b77534761b5}"
+              }
+            },
+            "summary": {
+              "raw": "Initial commit",
+              "markup": "markdown",
+              "html": "<p>Initial commit</p>",
+              "type": "rendered"
+            },
+            "parents": [],
+            "date": "2018-11-19T14:51:37+00:00",
+            "message": "Initial commit",
+            "type": "commit"
+          },
+          "links": {
+            "commits": {
+              "href": "https://api.bitbucket.org/2.0/repositories/mbridgen/dummy/commits/master"
+            },
+            "self": {
+              "href": "https://api.bitbucket.org/2.0/repositories/mbridgen/dummy/refs/branches/master"
+            },
+            "html": {
+              "href": "https://bitbucket.org/mbridgen/dummy/branch/master"
+            }
+          },
+          "default_merge_strategy": "merge_commit",
+          "merge_strategies": [
+            "merge_commit",
+            "squash",
+            "fast_forward"
+          ],
+          "type": "branch",
+          "name": "master"
+        },
+        "links": {
+          "commits": {
+            "href": "https://api.bitbucket.org/2.0/repositories/mbridgen/dummy/commits?include=6db247ef432063e73512b86edf7b4a72da927355&exclude=2269f06c06bebc4f4da528a4144390fddd2cc190"
+          },
+          "html": {
+            "href": "https://bitbucket.org/mbridgen/dummy/branches/compare/6db247ef432063e73512b86edf7b4a72da927355..2269f06c06bebc4f4da528a4144390fddd2cc190"
+          },
+          "diff": {
+            "href": "https://api.bitbucket.org/2.0/repositories/mbridgen/dummy/diff/6db247ef432063e73512b86edf7b4a72da927355..2269f06c06bebc4f4da528a4144390fddd2cc190"
+          }
+        },
+        "truncated": false,
+        "commits": [
+          {
+            "hash": "6db247ef432063e73512b86edf7b4a72da927355",
+            "links": {
+              "self": {
+                "href": "https://api.bitbucket.org/2.0/repositories/mbridgen/dummy/commit/6db247ef432063e73512b86edf7b4a72da927355"
+              },
+              "comments": {
+                "href": "https://api.bitbucket.org/2.0/repositories/mbridgen/dummy/commit/6db247ef432063e73512b86edf7b4a72da927355/comments"
+              },
+              "patch": {
+                "href": "https://api.bitbucket.org/2.0/repositories/mbridgen/dummy/patch/6db247ef432063e73512b86edf7b4a72da927355"
+              },
+              "html": {
+                "href": "https://bitbucket.org/mbridgen/dummy/commits/6db247ef432063e73512b86edf7b4a72da927355"
+              },
+              "diff": {
+                "href": "https://api.bitbucket.org/2.0/repositories/mbridgen/dummy/diff/6db247ef432063e73512b86edf7b4a72da927355"
+              },
+              "approve": {
+                "href": "https://api.bitbucket.org/2.0/repositories/mbridgen/dummy/commit/6db247ef432063e73512b86edf7b4a72da927355/approve"
+              },
+              "statuses": {
+                "href": "https://api.bitbucket.org/2.0/repositories/mbridgen/dummy/commit/6db247ef432063e73512b86edf7b4a72da927355/statuses"
+              }
+            },
+            "author": {
+              "raw": "Michael Bridgen <mikeb@squaremobius.net>",
+              "type": "author"
+            },
+            "summary": {
+              "raw": "Hello world\n",
+              "markup": "markdown",
+              "html": "<p>Hello world</p>",
+              "type": "rendered"
+            },
+            "parents": [
+              {
+                "type": "commit",
+                "hash": "2269f06c06bebc4f4da528a4144390fddd2cc190",
+                "links": {
+                  "self": {
+                    "href": "https://api.bitbucket.org/2.0/repositories/mbridgen/dummy/commit/2269f06c06bebc4f4da528a4144390fddd2cc190"
+                  },
+                  "html": {
+                    "href": "https://bitbucket.org/mbridgen/dummy/commits/2269f06c06bebc4f4da528a4144390fddd2cc190"
+                  }
+                }
+              }
+            ],
+            "date": "2018-11-19T17:13:36+00:00",
+            "message": "Hello world\n",
+            "type": "commit"
+          }
+        ],
+        "created": false,
+        "closed": false,
+        "new": {
+          "target": {
+            "hash": "6db247ef432063e73512b86edf7b4a72da927355",
+            "links": {
+              "self": {
+                "href": "https://api.bitbucket.org/2.0/repositories/mbridgen/dummy/commit/6db247ef432063e73512b86edf7b4a72da927355"
+              },
+              "html": {
+                "href": "https://bitbucket.org/mbridgen/dummy/commits/6db247ef432063e73512b86edf7b4a72da927355"
+              }
+            },
+            "author": {
+              "raw": "Michael Bridgen <mikeb@squaremobius.net>",
+              "type": "author"
+            },
+            "summary": {
+              "raw": "Hello world\n",
+              "markup": "markdown",
+              "html": "<p>Hello world</p>",
+              "type": "rendered"
+            },
+            "parents": [
+              {
+                "type": "commit",
+                "hash": "2269f06c06bebc4f4da528a4144390fddd2cc190",
+                "links": {
+                  "self": {
+                    "href": "https://api.bitbucket.org/2.0/repositories/mbridgen/dummy/commit/2269f06c06bebc4f4da528a4144390fddd2cc190"
+                  },
+                  "html": {
+                    "href": "https://bitbucket.org/mbridgen/dummy/commits/2269f06c06bebc4f4da528a4144390fddd2cc190"
+                  }
+                }
+              }
+            ],
+            "date": "2018-11-19T17:13:36+00:00",
+            "message": "Hello world\n",
+            "type": "commit"
+          },
+          "links": {
+            "commits": {
+              "href": "https://api.bitbucket.org/2.0/repositories/mbridgen/dummy/commits/master"
+            },
+            "self": {
+              "href": "https://api.bitbucket.org/2.0/repositories/mbridgen/dummy/refs/branches/master"
+            },
+            "html": {
+              "href": "https://bitbucket.org/mbridgen/dummy/branch/master"
+            }
+          },
+          "default_merge_strategy": "merge_commit",
+          "merge_strategies": [
+            "merge_commit",
+            "squash",
+            "fast_forward"
+          ],
+          "type": "branch",
+          "name": "master"
+        }
+      }
+    ]
+  },
+  "repository": {
+    "scm": "git",
+    "website": "",
+    "name": "dummy",
+    "links": {
+      "self": {
+        "href": "https://api.bitbucket.org/2.0/repositories/mbridgen/dummy"
+      },
+      "html": {
+        "href": "https://bitbucket.org/mbridgen/dummy"
+      },
+      "avatar": {
+        "href": "https://bytebucket.org/ravatar/%7B6cf7f1fc-003b-4e82-9a31-352d506530b0%7D?ts=go"
+      }
+    },
+    "full_name": "mbridgen/dummy",
+    "owner": {
+      "username": "mbridgen",
+      "display_name": "Michael Bridgen",
+      "account_id": "5bf2cda767e4d1175166c7f6",
+      "links": {
+        "self": {
+          "href": "https://api.bitbucket.org/2.0/users/mbridgen"
+        },
+        "html": {
+          "href": "https://bitbucket.org/mbridgen/"
+        },
+        "avatar": {
+          "href": "https://bitbucket.org/account/mbridgen/avatar/"
+        }
+      },
+      "type": "user",
+      "nickname": "mbridgen",
+      "uuid": "{3995cc2b-9848-486a-908a-8b77534761b5}"
+    },
+    "type": "repository",
+    "is_private": false,
+    "uuid": "{6cf7f1fc-003b-4e82-9a31-352d506530b0}"
+  },
+  "actor": {
+    "username": "mbridgen",
+    "display_name": "Michael Bridgen",
+    "account_id": "5bf2cda767e4d1175166c7f6",
+    "links": {
+      "self": {
+        "href": "https://api.bitbucket.org/2.0/users/mbridgen"
+      },
+      "html": {
+        "href": "https://bitbucket.org/mbridgen/"
+      },
+      "avatar": {
+        "href": "https://bitbucket.org/account/mbridgen/avatar/"
+      }
+    },
+    "type": "user",
+    "nickname": "mbridgen",
+    "uuid": "{3995cc2b-9848-486a-908a-8b77534761b5}"
+  }
+}
