@@ -1,0 +1,89 @@
+{
+  "eventKey": "repo:refs_changed",
+  "date": "2020-01-09T18:22:47-0800",
+  "actor": {
+    "name": "abursavich",
+    "emailAddress": "abursavich@redacted.com",
+    "id": 5730,
+    "displayName": "Andy Bursavich",
+    "active": true,
+    "slug": "abursavich",
+    "type": "NORMAL",
+    "links": {
+      "self": [
+        {
+          "href": "https://bitbucket.redacted.com/users/abursavich"
+        }
+      ]
+    }
+  },
+  "repository": {
+    "slug": "hook-test",
+    "id": 4544,
+    "name": "hook-test",
+    "scmId": "git",
+    "state": "AVAILABLE",
+    "statusMessage": "Available",
+    "forkable": true,
+    "project": {
+      "key": "~ABURSAVICH",
+      "id": 1167,
+      "name": "Andy Bursavich",
+      "type": "PERSONAL",
+      "owner": {
+        "name": "abursavich",
+        "emailAddress": "abursavich@redacted.com",
+        "id": 5730,
+        "displayName": "Andy Bursavich",
+        "active": true,
+        "slug": "abursavich",
+        "type": "NORMAL",
+        "links": {
+          "self": [
+            {
+              "href": "https://bitbucket.redacted.com/users/abursavich"
+            }
+          ]
+        }
+      },
+      "links": {
+        "self": [
+          {
+            "href": "https://bitbucket.redacted.com/users/abursavich"
+          }
+        ]
+      }
+    },
+    "public": false,
+    "links": {
+      "clone": [
+        {
+          "href": "https://bitbucket.redacted.com/scm/~abursavich/hook-test.git",
+          "name": "http"
+        },
+        {
+          "href": "ssh://git@bitbucket.redacted.com/~abursavich/hook-test.git",
+          "name": "ssh"
+        }
+      ],
+      "self": [
+        {
+          "href": "https://bitbucket.redacted.com/users/abursavich/repos/hook-test/browse"
+        }
+      ]
+    }
+  },
+  "changes": [
+    {
+      "ref": {
+        "id": "refs/heads/master",
+        "displayId": "master",
+        "type": "BRANCH"
+      },
+      "refId": "refs/heads/master",
+      "fromHash": "0000000000000000000000000000000000000000",
+      "toHash": "a93eaf9b94009af4bad03d929185393672a1d788",
+      "type": "ADD"
+    }
+  ]
+}

@@ -94,7 +94,7 @@ func Test_GitHubSource(t *testing.T) {
 	assert.NoError(t, err)
 	req.Header.Add("Content-Type", "application/json")
 	req.Header.Add("X-GitHub-Event", "push")
-	req.Header.Add("X-Hub-Signature", genGithubMAC(payload, loadFixture(t, "github_key"))) // <-- same as in the endpoint
+	req.Header.Add("X-Hub-Signature", xHubSignature(payload, loadFixture(t, "github_key"))) // <-- same as in the endpoint
 
 	res, err := c.Do(req)
 	assert.NoError(t, err)
@@ -109,7 +109,7 @@ func Test_GitHubSource(t *testing.T) {
 	assert.NoError(t, err)
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 	req.Header.Set("X-Github-Event", "push")
-	req.Header.Add("X-Hub-Signature", genGithubMAC([]byte(form.Encode()), loadFixture(t, "github_key"))) // <-- same as in the endpoint
+	req.Header.Add("X-Hub-Signature", xHubSignature([]byte(form.Encode()), loadFixture(t, "github_key"))) // <-- same as in the endpoint
 
 	res, err = c.Do(req)
 	assert.NoError(t, err)
@@ -122,15 +122,15 @@ func Test_GitHubSource(t *testing.T) {
 	assert.NoError(t, err)
 	req.Header.Add("Content-Type", "application/json")
 	req.Header.Add("X-GitHub-Event", "push")
-	req.Header.Add("X-Hub-Signature", genGithubMAC(payload[1:] /* <-- i.e., not the same */, loadFixture(t, "github_key")))
+	req.Header.Add("X-Hub-Signature", xHubSignature(payload[1:] /* <-- i.e., not the same */, loadFixture(t, "github_key")))
 	res, err = c.Do(req)
 	assert.NoError(t, err)
 	assert.False(t, called)
 	assert.Equal(t, 401, res.StatusCode)
 }
 
-// genGithubMAC generates the GitHub HMAC signature for a message provided the secret key
-func genGithubMAC(message, key []byte) string {
+// xHubSignature generates the X-Hub-Signature header value for the message and key
+func xHubSignature(message, key []byte) string {
 	mac := hmac.New(sha512.New, key)
 	mac.Write(message)
 	signature := mac.Sum(nil)
@@ -189,14 +189,14 @@ func TestBitbucketCloud(t *testing.T) {
 	downstream := newDownstream(t, expectedBitbucketCloud, &called)
 	defer downstream.Close()
 
-	endpoint := Endpoint{Source: BitbucketCloud, KeyPath: "bitbucketorg_key"}
+	endpoint := Endpoint{Source: BitbucketCloud, KeyPath: "bitbucket_cloud_key"}
 	fp, handler, err := HandlerFromEndpoint("test/fixtures", downstream.URL, endpoint)
 	assert.NoError(t, err)
 
 	hookServer := httptest.NewTLSServer(handler)
 	defer hookServer.Close()
 
-	payload := loadFixture(t, "bitbucketorg_payload")
+	payload := loadFixture(t, "bitbucket_cloud_payload")
 
 	c := hookServer.Client()
 	req, err := http.NewRequest("POST", hookServer.URL+"/hook/"+fp, bytes.NewReader(payload))
@@ -219,4 +219,66 @@ func TestBitbucketCloud(t *testing.T) {
 	assert.NoError(t, err)
 	assert.False(t, called)
 	assert.Equal(t, 400, res.StatusCode)
+}
+
+func TestBitbucketServer(t *testing.T) {
+	const expected = `{"Kind":"git","Source":{"URL":"ssh://git@bitbucket.redacted.com/~abursavich/hook-test.git","Branch":"master"}}`
+
+	notified := false
+	downstream := newDownstream(t, expected, &notified)
+	defer downstream.Close()
+
+	endpoint := Endpoint{Source: BitbucketServer, KeyPath: "bitbucket_server_key"}
+	digest, handler, err := HandlerFromEndpoint("test/fixtures", downstream.URL, endpoint)
+	assert.NoError(t, err)
+
+	hookServer := httptest.NewTLSServer(handler)
+	defer hookServer.Close()
+
+	c := hookServer.Client()
+	url := hookServer.URL + "/hook/" + digest
+	key := loadFixture(t, "bitbucket_server_key")
+	body := loadFixture(t, "bitbucket_server_payload")
+
+	for _, tt := range []struct {
+		desc     string
+		key      []byte
+		body     []byte
+		status   int
+		notified bool
+	}{
+		{
+			desc:     "ok",
+			key:      key,
+			body:     body,
+			status:   http.StatusOK,
+			notified: true,
+		},
+		{
+			desc:   "bad key",
+			key:    key[1:],
+			body:   body,
+			status: http.StatusUnauthorized,
+		},
+		{
+			desc:   "bad payload",
+			key:    key,
+			body:   body[1:],
+			status: http.StatusBadRequest,
+		},
+	} {
+		t.Run(tt.desc, func(t *testing.T) {
+			req, err := http.NewRequest("POST", url, bytes.NewReader(tt.body))
+			assert.NoError(t, err)
+			req.Header.Add("Content-Type", "application/json")
+			req.Header.Add("X-Event-Key", "repo:refs_changed")
+			req.Header.Add("X-Hub-Signature", xHubSignature(tt.body, tt.key))
+
+			notified = false
+			resp, err := c.Do(req)
+			assert.NoError(t, err)
+			assert.Equal(t, tt.status, resp.StatusCode)
+			assert.Equal(t, tt.notified, notified)
+		})
+	}
 }
