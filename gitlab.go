@@ -16,7 +16,7 @@ func init() {
 	Sources[GitLab] = handleGitlabPush
 }
 
-func handleGitlabPush(s fluxapi.Server, key []byte, w http.ResponseWriter, r *http.Request) {
+func handleGitlabPush(s fluxapi.Server, key []byte, w http.ResponseWriter, r *http.Request, _ Endpoint) {
 	if r.Header.Get("X-Gitlab-Token") != string(key) {
 		http.Error(w, "The Gitlab token does not match", http.StatusUnauthorized)
 		log(GitLab, "missing or incorrect X-Gitlab-Token header (!= shared secret)")

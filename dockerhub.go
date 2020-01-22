@@ -13,7 +13,7 @@ func init() {
 	Sources[DockerHub] = handleDockerhub
 }
 
-func handleDockerhub(s fluxapi.Server, _ []byte, w http.ResponseWriter, r *http.Request) {
+func handleDockerhub(s fluxapi.Server, _ []byte, w http.ResponseWriter, r *http.Request, _ Endpoint) {
 	type payload struct {
 		Repository struct {
 			RepoName string `json:"repo_name"`

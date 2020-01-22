@@ -13,7 +13,7 @@ func init() {
 	Sources[Quay] = handleQuay
 }
 
-func handleQuay(s fluxapi.Server, _ []byte, w http.ResponseWriter, r *http.Request) {
+func handleQuay(s fluxapi.Server, _ []byte, w http.ResponseWriter, r *http.Request, _ Endpoint) {
 	type payload struct {
 		RepoName string `json:"docker_url"`
 	}

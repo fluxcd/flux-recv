@@ -27,7 +27,7 @@ func init() {
 	Sources[BitbucketCloud] = handleBitbucketCloudPush
 }
 
-func handleBitbucketCloudPush(s fluxapi.Server, _ []byte, w http.ResponseWriter, r *http.Request) {
+func handleBitbucketCloudPush(s fluxapi.Server, _ []byte, w http.ResponseWriter, r *http.Request, _ Endpoint) {
 	if event := r.Header.Get("X-Event-Key"); event != "repo:push" {
 		http.Error(w, "Unexpected or missing header X-Event-Key", http.StatusBadRequest)
 		log(BitbucketCloud, "missing or incorrect X-Event-Key header:", event)

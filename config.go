@@ -7,9 +7,14 @@ import (
 	"github.com/ghodss/yaml"
 )
 
+type Auth struct {
+	Audience string `json:"audience"`
+}
+
 type Endpoint struct {
-	Source  string `json:"source"`
-	KeyPath string `json:"keyPath"`
+	Source         string `json:"source"`
+	KeyPath        string `json:"keyPath"`
+	Authentication *Auth  `json:"authentication,omitempty"`
 }
 
 type Config struct {

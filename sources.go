@@ -17,7 +17,7 @@ import (
 	"github.com/fluxcd/flux/pkg/image"
 )
 
-type HookHandler func(s fluxapi.Server, key []byte, w http.ResponseWriter, r *http.Request)
+type HookHandler func(s fluxapi.Server, key []byte, w http.ResponseWriter, r *http.Request, config Endpoint)
 
 var Sources = map[string]HookHandler{}
 
@@ -53,7 +53,7 @@ func HandlerFromEndpoint(baseDir, apiUrl string, ep Endpoint) (string, http.Hand
 
 	// 3. construct a handler from the above
 	return digest, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		sourceHandler(apiClient, key, w, r)
+		sourceHandler(apiClient, key, w, r, ep)
 	}), nil
 }
 

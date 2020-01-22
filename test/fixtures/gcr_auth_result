@@ -1,0 +1,13 @@
+{
+  "aud": "gcr-update",
+  "azp": "103416794574132452123",
+  "email": "gcr-publisher@iam.gserviceaccount.com",
+  "email_verified": "true",
+  "exp": "1580360146",
+  "iat": "1580356546",
+  "iss": "https://accounts.google.com",
+  "sub": "103243794525501032581",
+  "alg": "RS256",
+  "kid": "b2ed0db1f661d8546769bab78d2fae7564fdc3a9",
+  "typ": "JWT"
+}
