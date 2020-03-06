@@ -54,6 +54,10 @@ func mainArgs(args []string) {
 		http.Handle(route, handler)
 		println("endpoint", ep.Source, "using key", filepath.Join(configDir, ep.KeyPath), "at", route)
 	}
+	http.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte("OK"))
+	})
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		http.NotFound(w, r)
 	})
