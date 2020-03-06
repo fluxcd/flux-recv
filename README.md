@@ -126,6 +126,10 @@ The second bit goes under `.spec.template.containers`:
         - --config=/etc/fluxrecv/fluxrecv.yaml
         ports:
         - containerPort: 8080
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 8080
         volumeMounts:
         - name: fluxrecv-config
           mountPath: /etc/fluxrecv
