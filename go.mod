@@ -12,4 +12,4 @@ require (
 	gopkg.in/yaml.v2 v2.2.5 // indirect
 )
 
-replace github.com/docker/distribution => github.com/2opremio/distribution v0.0.0-20190419185413-6c9727e5e5de
+replace github.com/docker/distribution => github.com/fluxcd/distribution v0.0.0-20190419185413-6c9727e5e5de
