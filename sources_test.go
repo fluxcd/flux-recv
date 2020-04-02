@@ -182,9 +182,46 @@ func Test_GitLabSource(t *testing.T) {
 	assert.Equal(t, 401, res.StatusCode)
 }
 
+const expectedHarbor = `{"Kind":"image","Source":{"Name":{"Domain":"demo.goharbor.io","Image":"test123/alpine"}}}`
+
+func Test_Harbor(t *testing.T) {
+	var called bool
+	downstream := newDownstream(t, expectedHarbor, &called)
+	defer downstream.Close()
+
+	endpoint := Endpoint{Source: Harbor, KeyPath: "harbor_key"}
+	fp, handler, err := HandlerFromEndpoint("test/fixtures", downstream.URL, endpoint)
+	assert.NoError(t, err)
+
+	hookServer := httptest.NewTLSServer(handler)
+	defer hookServer.Close()
+
+	payload := loadFixture(t, "harbor_payload")
+
+	c := hookServer.Client()
+	req, err := http.NewRequest("POST", hookServer.URL+"/hook/"+fp, bytes.NewReader(payload))
+	assert.NoError(t, err)
+	req.Header.Set("Authorization", string(loadFixture(t, "harbor_key")))
+
+	res, err := c.Do(req)
+	assert.NoError(t, err)
+	assert.True(t, called)
+	assert.Equal(t, 200, res.StatusCode)
+
+	// Check that bogus token is rejected
+	called = false
+	req, err = http.NewRequest("POST", hookServer.URL+"/hook/"+fp, bytes.NewReader(payload))
+	assert.NoError(t, err)
+	req.Header.Set("Authorization", "BOGUS")
+	res, err = c.Do(req)
+	assert.NoError(t, err)
+	assert.False(t, called)
+	assert.Equal(t, 401, res.StatusCode)
+}
+
 const expectedBitbucketCloud = `{"Kind":"git","Source":{"URL":"git@bitbucket.org:mbridgen/dummy.git","Branch":"master"}}`
 
-func TestBitbucketCloud(t *testing.T) {
+func Test_BitbucketCloud(t *testing.T) {
 	var called bool
 	downstream := newDownstream(t, expectedBitbucketCloud, &called)
 	defer downstream.Close()
@@ -221,7 +258,7 @@ func TestBitbucketCloud(t *testing.T) {
 	assert.Equal(t, 400, res.StatusCode)
 }
 
-func TestBitbucketServer(t *testing.T) {
+func Test_BitbucketServer(t *testing.T) {
 	const expected = `{"Kind":"git","Source":{"URL":"ssh://git@bitbucket.redacted.com/~abursavich/hook-test.git","Branch":"master"}}`
 
 	notified := false

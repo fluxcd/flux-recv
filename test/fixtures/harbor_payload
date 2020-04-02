@@ -1,0 +1,21 @@
+{
+   "type":"pushImage",
+   "occur_at":1585846234,
+   "operator":"hiddeco",
+   "event_data":{
+      "resources":[
+         {
+            "digest":"sha256:e4355b66995c96b4b468159fc5c7e3540fcef961189ca13fee877798649f531a",
+            "tag":"3.10",
+            "resource_url":"demo.goharbor.io/test123/alpine:3.10"
+         }
+      ],
+      "repository":{
+         "date_created":1585846139,
+         "name":"alpine",
+         "namespace":"test123",
+         "repo_full_name":"test123/alpine",
+         "repo_type":"private"
+      }
+   }
+}
