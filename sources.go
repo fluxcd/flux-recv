@@ -47,6 +47,7 @@ func HandlerFromEndpoint(baseDir, apiUrl string, ep Endpoint) (string, http.Hand
 
 	sha := sha256.New()
 	sha.Write(key)
+	sha.Write([]byte(ep.RegistryHost))
 	digest := fmt.Sprintf("%x", sha.Sum(nil))
 
 	apiClient := fluxclient.New(http.DefaultClient, fluxhttp.NewAPIRouter(), apiUrl, fluxclient.Token(""))

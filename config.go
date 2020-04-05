@@ -13,6 +13,7 @@ type Auth struct {
 
 type Endpoint struct {
 	Source         string `json:"source"`
+	RegistryHost   string `json:"registryHost,omitempty"`
 	KeyPath        string `json:"keyPath"`
 	Authentication *Auth  `json:"authentication,omitempty"`
 }

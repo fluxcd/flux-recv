@@ -243,6 +243,47 @@ func Test_Harbor(t *testing.T) {
 	assert.Equal(t, 401, res.StatusCode)
 }
 
+const expectedNexus = `{"Kind":"image","Source":{"Name":{"Domain":"container.example.com","Image":"app1/alpine"}}}`
+
+func Test_Nexus(t *testing.T) {
+	var called bool
+	downstream := newDownstream(t, expectedNexus, &called)
+	defer downstream.Close()
+
+	endpoint := Endpoint{Source: Nexus, KeyPath: "nexus_key", RegistryHost: "container.example.com"}
+	fp, handler, err := HandlerFromEndpoint("test/fixtures", downstream.URL, endpoint)
+	assert.NoError(t, err)
+
+	hookServer := httptest.NewTLSServer(handler)
+	defer hookServer.Close()
+
+	payload := loadFixture(t, "nexus_payload")
+
+	c := hookServer.Client()
+	req, err := http.NewRequest("POST", hookServer.URL+"/hook/"+fp, bytes.NewReader(payload))
+	assert.NoError(t, err)
+	req.Header.Set("X-Nexus-Webhook-Id", "rm:repository:component")
+	req.Header.Set("X-Nexus-Webhook-Delivery", "bd9e6aef-0e27-4570-980d-f639c49ab5ed")
+	req.Header.Set("X-Nexus-Webhook-Signature", "d06eea380d4631e8c1180b689d10d9ba83ab68f6")
+
+	res, err := c.Do(req)
+	assert.NoError(t, err)
+	assert.True(t, called)
+	assert.Equal(t, 200, res.StatusCode)
+
+	// check that bogus signature is rejected
+	called = false
+	req, err = http.NewRequest("POST", hookServer.URL+"/hook/"+fp, bytes.NewReader(payload))
+	assert.NoError(t, err)
+	req.Header.Set("X-Nexus-Webhook-Id", "rm:repository:component")
+	req.Header.Set("X-Nexus-Webhook-Delivery", "bd9e6aef-0e27-4570-980d-f639c49ab5ed")
+	req.Header.Set("X-Nexus-Webhook-Signature", "BOGUS")
+	res, err = c.Do(req)
+	assert.NoError(t, err)
+	assert.False(t, called)
+	assert.Equal(t, 401, res.StatusCode)
+}
+
 const expectedBitbucketCloud = `{"Kind":"git","Source":{"URL":"git@bitbucket.org:mbridgen/dummy.git","Branch":"master"}}`
 
 func Test_BitbucketCloud(t *testing.T) {

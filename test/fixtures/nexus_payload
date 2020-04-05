@@ -1,0 +1,1 @@
+{"timestamp":"2020-04-05T21:49:44.219+0000","nodeId":"8C4F3E91-CD46AFE0-61B8403D-94526884-19AC4E06","initiator":"admin/127.0.0.1","repositoryName":"app1","action":"CREATED","component":{"id":"c770169c0b2e3ed8357368b43d4da3d8","componentId":"YXBwMTpjNzcwMTY5YzBiMmUzZWQ4MzU3MzY4YjQzZDRkYTNkOA","format":"docker","name":"app1/alpine","version":"3.4"}}

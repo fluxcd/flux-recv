@@ -24,6 +24,7 @@ exposing to the internet, because
  - `GitLab` push events
  - `Bitbucket` push events
  - `GoogleContainerRegistry` image push events via pubsub
+ - `Nexus` image push events
 
 ## How to use it
 
