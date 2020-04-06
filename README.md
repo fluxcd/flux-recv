@@ -20,6 +20,7 @@ exposing to the internet, because
 
  - `GitHub` push events (and ping events)
  - `DockerHub` image push events
+ - `Quay` image push events
  - `GitLab` push events
  - `Bitbucket` push events
 

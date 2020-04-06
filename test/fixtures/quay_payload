@@ -1,0 +1,10 @@
+{
+   "name":"foo",
+   "repository":"hiddeco/foo",
+   "namespace":"hiddeco",
+   "docker_url":"quay.io/hiddeco/foo",
+   "homepage":"https://quay.io/repository/hiddeco/foo",
+   "updated_tags":[
+      "3.10"
+   ]
+}
