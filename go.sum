@@ -49,6 +49,8 @@ github.com/elazarl/goproxy/ext v0.0.0-20190421051319-9d40249d3c2f/go.mod h1:gNh8
 github.com/envoyproxy/go-control-plane v0.6.9/go.mod h1:SBwIajubJHhxtWwsL9s8ss4safvEdbitLhGGK48rN6g=
 github.com/evanphx/json-patch v4.1.0+incompatible/go.mod h1:50XU6AFN0ol/bzJsmQLiYLvXMP4fmwYFNcr97nuDLSk=
 github.com/fatih/color v1.7.0/go.mod h1:Zm6kSWBoL9eyXnKyktHP6abPY2pDugNf5KwzbycvMj4=
+github.com/fluxcd/distribution v0.0.0-20190419185413-6c9727e5e5de h1:0HEQXSlZuTWQo/7Q5QwDWmKG5z7qBEJnPyqyXbdBAUg=
+github.com/fluxcd/distribution v0.0.0-20190419185413-6c9727e5e5de/go.mod h1:ASaOpZRHjp+wRRJITxpCeWvc/eSk38vsvzXGKcp3rP8=
 github.com/fluxcd/flux v1.15.0 h1:xWu4dRrF7Qdsojdn9wjtoL4XsLtsGFyVHqQwh+WRuwY=
 github.com/fluxcd/flux v1.15.0/go.mod h1:eKTHFkxOIEQL23j5Uz+OY1NLcWDjppTPlsRlDol6JZk=
 github.com/fluxcd/helm-operator v1.0.0-rc1/go.mod h1:qBr+Yiqv9T2EjBsYzJNFQJ83b0ALM+aCJhxtPWyOP+E=
