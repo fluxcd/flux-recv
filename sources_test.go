@@ -64,6 +64,30 @@ func Test_DockerHubSource(t *testing.T) {
 	assert.Equal(t, 200, res.StatusCode)
 }
 
+const expectedQuay = `{"Kind":"image","Source":{"Name":{"Domain":"quay.io","Image":"hiddeco/foo"}}}`
+
+func Test_Quay(t *testing.T) {
+	var called bool
+	downstream := newDownstream(t, expectedQuay, &called)
+	defer downstream.Close()
+
+	endpoint := Endpoint{Source: Quay, KeyPath: "quay_key"}
+	fp, handler, err := HandlerFromEndpoint("test/fixtures", downstream.URL, endpoint)
+	assert.NoError(t, err)
+
+	hookServer := httptest.NewTLSServer(handler)
+	defer hookServer.Close()
+
+	c := hookServer.Client()
+	req, err := http.NewRequest("POST", hookServer.URL+"/hook/"+fp, bytes.NewReader(loadFixture(t, "quay_payload")))
+	assert.NoError(t, err)
+
+	res, err := c.Do(req)
+	assert.NoError(t, err)
+	assert.True(t, called)
+	assert.Equal(t, 200, res.StatusCode)
+}
+
 const expectedGithub = `{"Kind":"git","Source":{"URL":"git@github.com:Codertocat/Hello-World.git","Branch":"refs/tags/simple-tag"}}`
 
 // Docs:
