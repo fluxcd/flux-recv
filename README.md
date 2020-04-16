@@ -23,6 +23,7 @@ exposing to the internet, because
  - `Quay` image push events
  - `GitLab` push events
  - `Bitbucket` push events
+ - `GoogleContainerRegistry` image push events via pubsub
 
 ## How to use it
 

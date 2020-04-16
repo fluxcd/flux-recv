@@ -19,7 +19,7 @@ func init() {
 	Sources[BitbucketServer] = handleBitbucketServerPush
 }
 
-func handleBitbucketServerPush(s fluxapi.Server, key []byte, w http.ResponseWriter, r *http.Request) {
+func handleBitbucketServerPush(s fluxapi.Server, key []byte, w http.ResponseWriter, r *http.Request, _ Endpoint) {
 	// See incomplete docs: https://confluence.atlassian.com/bitbucketserver/event-payload-938025882.html
 
 	body, err := github.ValidatePayload(r, key)

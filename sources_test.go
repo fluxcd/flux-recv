@@ -343,3 +343,57 @@ func Test_BitbucketServer(t *testing.T) {
 		})
 	}
 }
+
+const expectedGoogleContainerRegistry = `{"Kind":"image","Source":{"Name":{"Domain":"us.gcr.io","Image":"am/am.kebab.api"}}}`
+
+// Test that a google pubsub message (push) arriving from Google Container Registry
+// calls the downstream with an image update.
+// GCR Docs:
+// https://cloud.google.com/container-registry/docs/configuring-notifications
+// Pubsub Push Docs:
+// https://cloud.google.com/pubsub/docs/push
+func Test_GoogleContainerRegistry_WhenNoAuth(t *testing.T) {
+	var called bool
+	downstream := newDownstream(t, expectedGoogleContainerRegistry, &called)
+	defer downstream.Close()
+
+	endpoint := Endpoint{Source: GoogleContainerRegistry, KeyPath: "gcr_key", Authentication: nil}
+	fp, handler, err := HandlerFromEndpoint("test/fixtures", downstream.URL, endpoint)
+	assert.NoError(t, err)
+
+	hookServer := httptest.NewTLSServer(handler)
+	defer hookServer.Close()
+
+	c := hookServer.Client()
+	req, err := http.NewRequest("POST", hookServer.URL+"/hook/"+fp, bytes.NewReader(loadFixture(t, "gcr_payload")))
+	assert.NoError(t, err)
+
+	res, err := c.Do(req)
+	assert.NoError(t, err)
+	assert.True(t, called)
+	assert.Equal(t, 200, res.StatusCode)
+	assert.Empty(t, res.Body)
+}
+
+type roundTripFunc func(r *http.Request) (*http.Response, error)
+
+func (s roundTripFunc) RoundTrip(r *http.Request) (*http.Response, error) {
+	return s(r)
+}
+
+func Test_GoogleContainerRegistry_WhenAuth(t *testing.T) {
+	c := &http.Client{
+		Transport: roundTripFunc(func(r *http.Request) (*http.Response, error) {
+			return &http.Response{
+				StatusCode: 200,
+				Body:       ioutil.NopCloser(bytes.NewBuffer(loadFixture(t, "gcr_auth_result"))),
+			}, nil
+		}),
+	}
+
+	token := "Bearer 123"
+	audience := "gcr-update"
+
+	err := authenticateRequest(c, token, audience)
+	assert.NoError(t, err)
+}

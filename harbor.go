@@ -13,7 +13,7 @@ func init() {
 	Sources[Harbor] = handleHarbor
 }
 
-func handleHarbor(s fluxapi.Server, key []byte, w http.ResponseWriter, r *http.Request) {
+func handleHarbor(s fluxapi.Server, key []byte, w http.ResponseWriter, r *http.Request, _ Endpoint) {
 	if r.Header.Get("Authorization") != string(key) {
 		http.Error(w, "The Harbor token does not match", http.StatusUnauthorized)
 		log(Harbor, "missing or incorrect Authorization header (!= shared secret)")
