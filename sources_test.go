@@ -398,7 +398,7 @@ func Test_GoogleContainerRegistry_WhenNoAuth(t *testing.T) {
 	downstream := newDownstream(t, expectedGoogleContainerRegistry, &called)
 	defer downstream.Close()
 
-	endpoint := Endpoint{Source: GoogleContainerRegistry, KeyPath: "gcr_key", Authentication: nil}
+	endpoint := Endpoint{Source: GoogleContainerRegistry, KeyPath: "gcr_key", GCR: nil}
 	fp, handler, err := HandlerFromEndpoint("test/fixtures", downstream.URL, endpoint)
 	assert.NoError(t, err)
 
