@@ -26,6 +26,9 @@ exposing to the internet, because
  - `GoogleContainerRegistry` image push events via pubsub
  - `Nexus` image push events
 
+Some of these have specific configuration options; see
+[Source-specific configuration](#source-specific-configuration) below.
+
 ## How to use it
 
 In short:
@@ -143,7 +146,7 @@ though you may want to supply the argument `--listen=localhost:3030`
 to limit API access to localhost, if you don't already.
 
 > If you do restrict API access to localhost, make sure you also
-> 
+>
 >  - supply `--listen-metrics=:3031`
 >  - annotate the pod with `prometheus.io/port: "3031"`, so
 >    Prometheus knows which port to scrape).
@@ -306,3 +309,22 @@ trigger to refresh state, rather than as authoritative themselves. For
 example, when informed of an image push, fluxd does not add the image
 mentioned to its database -- it polls the image registry in question
 to determine whether there is a new image.
+
+### Source-specific configuration
+
+#### Google Container Registry
+
+The Google Container Registry endpoint expects a [push
+subscription](https://cloud.google.com/pubsub/docs/push) to be set
+up. If you include a `gcr` field in the endpoint configuration, it
+will authenticate and verify the audience for incoming webhook
+payloads:
+
+```
+fluxRecvVersion: 1
+endpoints:
+- source: GoogleContainerRegistry
+  keyPath: gcr.key
+  gcr:
+    audience: flux-push-notification
+```
