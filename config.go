@@ -7,15 +7,15 @@ import (
 	"github.com/ghodss/yaml"
 )
 
-type Auth struct {
+type GCRAuth struct {
 	Audience string `json:"audience"`
 }
 
 type Endpoint struct {
-	Source         string `json:"source"`
-	RegistryHost   string `json:"registryHost,omitempty"`
-	KeyPath        string `json:"keyPath"`
-	Authentication *Auth  `json:"authentication,omitempty"`
+	Source       string   `json:"source"`
+	RegistryHost string   `json:"registryHost,omitempty"`
+	KeyPath      string   `json:"keyPath"`
+	GCR          *GCRAuth `json:"gcr,omitempty"`
 }
 
 type Config struct {

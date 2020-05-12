@@ -40,8 +40,8 @@ func init() {
 
 func handleGoogleContainerRegistry(s fluxapi.Server, _ []byte, w http.ResponseWriter, r *http.Request, config Endpoint) {
 	// authenticate based on config
-	if config.Authentication != nil {
-		if err := authenticateRequest(&http.Client{}, r.Header.Get("Authorization"), config.Authentication.Audience); err != nil {
+	if config.GCR != nil {
+		if err := authenticateRequest(&http.Client{}, r.Header.Get("Authorization"), config.GCR.Audience); err != nil {
 			http.Error(w, "Cannot authorize request", http.StatusOK)
 			log(GoogleContainerRegistry, err.Error())
 			return
