@@ -36,7 +36,7 @@ func handleHarbor(s fluxapi.Server, key []byte, w http.ResponseWriter, r *http.R
 		return
 	}
 
-	if p.Type != "pushImage" {
+	if p.Type != "pushImage" && p.Type != "PUSH_ARTIFACT" {
 		http.Error(w, "Unexpected event type", http.StatusBadRequest)
 		log(Harbor, "unexpected event type:", p.Type)
 		return

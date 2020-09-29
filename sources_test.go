@@ -243,6 +243,43 @@ func Test_Harbor(t *testing.T) {
 	assert.Equal(t, 401, res.StatusCode)
 }
 
+const expectedHarborV2 = `{"Kind":"image","Source":{"Name":{"Domain":"hub.harbor.com","Image":"test-webhook/debian"}}}`
+
+func Test_HarborV2(t *testing.T) {
+	var called bool
+	downstream := newDownstream(t, expectedHarborV2, &called)
+	defer downstream.Close()
+
+	endpoint := Endpoint{Source: Harbor, KeyPath: "harborV2_key"}
+	fp, handler, err := HandlerFromEndpoint("test/fixtures", downstream.URL, endpoint)
+	assert.NoError(t, err)
+
+	hookServer := httptest.NewTLSServer(handler)
+	defer hookServer.Close()
+
+	payload := loadFixture(t, "harborV2_payload")
+
+	c := hookServer.Client()
+	req, err := http.NewRequest("POST", hookServer.URL+"/hook/"+fp, bytes.NewReader(payload))
+	assert.NoError(t, err)
+	req.Header.Set("Authorization", string(loadFixture(t, "harborV2_key")))
+
+	res, err := c.Do(req)
+	assert.NoError(t, err)
+	assert.True(t, called)
+	assert.Equal(t, 200, res.StatusCode)
+
+	// Check that bogus token is rejected
+	called = false
+	req, err = http.NewRequest("POST", hookServer.URL+"/hook/"+fp, bytes.NewReader(payload))
+	assert.NoError(t, err)
+	req.Header.Set("Authorization", "BOGUS")
+	res, err = c.Do(req)
+	assert.NoError(t, err)
+	assert.False(t, called)
+	assert.Equal(t, 401, res.StatusCode)
+}
+
 const expectedNexus = `{"Kind":"image","Source":{"Name":{"Domain":"container.example.com","Image":"app1/alpine"}}}`
 
 func Test_Nexus(t *testing.T) {
