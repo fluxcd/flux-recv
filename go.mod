@@ -9,7 +9,7 @@ require (
 	github.com/spf13/pflag v1.0.5
 	github.com/stretchr/testify v1.4.0
 	golang.org/x/sync v0.0.0-20190227155943-e225da77a7e6
-	gopkg.in/yaml.v2 v2.2.5 // indirect
+	gopkg.in/yaml.v2 v2.4.0 // indirect
 )
 
-replace github.com/docker/distribution => github.com/fluxcd/distribution v0.0.0-20190419185413-6c9727e5e5de
+replace github.com/docker/distribution => github.com/docker/distribution v2.7.0-rc.0+incompatible
