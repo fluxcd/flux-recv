@@ -1,4 +1,4 @@
-FROM alpine:3.9
+FROM alpine:3.14
 
 WORKDIR /home/flux
 ENTRYPOINT [ "/sbin/tini", "--", "/home/flux/flux-recv" ]
