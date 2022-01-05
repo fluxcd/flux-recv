@@ -9,7 +9,7 @@ import (
 
 	fluxapi "github.com/fluxcd/flux/pkg/api"
 	fluxapi_v9 "github.com/fluxcd/flux/pkg/api/v9"
-	"github.com/google/go-github/v28/github"
+	"github.com/google/go-github/v41/github"
 	"golang.org/x/sync/errgroup"
 )
 
