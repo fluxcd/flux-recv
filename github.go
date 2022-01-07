@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/google/go-github/v28/github"
+	"github.com/google/go-github/v41/github"
 
 	fluxapi "github.com/fluxcd/flux/pkg/api"
 	fluxapi_v9 "github.com/fluxcd/flux/pkg/api/v9"
