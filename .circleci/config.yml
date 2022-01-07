@@ -2,7 +2,7 @@ version: 2
 jobs:
   build:
     docker:
-    - image: circleci/golang:1.13
+    - image: circleci/golang:1.17
 
     steps:
     - checkout
@@ -18,7 +18,7 @@ jobs:
 
   push:
     docker:
-    - image: circleci/golang:1.13
+    - image: circleci/golang:1.17
 
     steps:
     - attach_workspace:
